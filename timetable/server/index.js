@@ -8,7 +8,7 @@ import { gql } from 'apollo-server-express';
 import { faker } from '@faker-js/faker';
 
 // Apollo Server
-const typeDefs = gql` #graphql
+const typeDefs = ` #graphql
     type Student {
         id: Int
         name: String
@@ -18,12 +18,17 @@ const typeDefs = gql` #graphql
 
     type Query {
         students: [Student]
+        student(id: Int): Student
     }
 `;
 
 const resolvers = {
     Query: {
-        students: () => studentsData
+        students: () => studentsData,
+        student: (parent, args) => {
+        const { id } = args;
+        return studentsData.find(student => student.id === id);
+        },
     }
 };
 
@@ -34,7 +39,7 @@ const server = new ApolloServer({
 
 const app = express();
 await server.start()
-app.use('/grapghql',cors(), express.json(), expressMiddleware(server));
+app.use('/graphql',cors(), express.json(), expressMiddleware(server));
 
 app.use(cors({
     origin: '*'

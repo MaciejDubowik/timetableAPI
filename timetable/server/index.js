@@ -1,18 +1,50 @@
 import express from 'express';
 import cors from 'cors';
 import http from 'http';
-// import socketIo from 'socket.io';
+import { ApolloServer } from '@apollo/server';
+import { expressMiddleware } from '@apollo/server/express4';
+import { startStandaloneServer } from '@apollo/server/standalone';
+import { gql } from 'apollo-server-express';
 import { faker } from '@faker-js/faker';
 
+// Apollo Server
+const typeDefs = gql` #graphql
+    type Student {
+        id: Int
+        name: String
+        surname: String
+        email: String
+    }
+
+    type Query {
+        students: [Student]
+    }
+`;
+
+const resolvers = {
+    Query: {
+        students: () => studentsData
+    }
+};
+
+const server = new ApolloServer({
+    typeDefs,
+    resolvers,
+});
+
 const app = express();
-const server = http.createServer(app);
-// const io = socketIo(server);
-app.use(cors());
+await server.start()
+app.use('/grapghql',cors(), express.json(), expressMiddleware(server));
+
+app.use(cors({
+    origin: '*'
+}
+))
 
 
-//generateUsers
 
-var usersData = []
+// Tworzenie danych o studentach
+const studentsData = [];
 
 function generateUser(id) {
     var user = {
@@ -25,26 +57,22 @@ function generateUser(id) {
 }
 
 for (let i = 0; i < 10; i++) {
-    usersData.push(generateUser(i))
+    studentsData.push(generateUser(i))
 }
 
 
-
-
 app.get('/students', (req, res) => {
-    res.json({ usersData });
+    res.json({ usersData: studentsData });
 });
 
 app.get('/students/:id', (req, res) => {
     const { id } = req.params;
-    const user = usersData[parseInt(id, 10)]
+    const user = studentsData[parseInt(id, 10)]
     res.json({ user });
 });
 
+const port = process.env.PORT || 4000; // Poprawienie portu
 
-const port = process.env.PORT || 3000;
-
-
-server.listen(port, () => {
-    console.log(`Serwer uruchomiony na porcie ${port}`);
+app.listen({ port }, () => {
+    console.log(`🚀 Server ready at http://localhost:${port}${server.graphqlPath}`);
 });

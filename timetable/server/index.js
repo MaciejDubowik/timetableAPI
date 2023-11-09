@@ -47,8 +47,6 @@ app.use(cors({
 ))
 
 
-
-// Tworzenie danych o studentach
 const studentsData = [];
 
 function generateUser(id) {
@@ -76,8 +74,21 @@ app.get('/students/:id', (req, res) => {
     res.json({ user });
 });
 
-const port = process.env.PORT || 4000; // Poprawienie portu
+const port = process.env.PORT || 4000; 
 
 app.listen({ port }, () => {
     console.log(`🚀 Server ready at http://localhost:${port}${server.graphqlPath}`);
 });
+
+
+//stworzyć group, course, lecturer, Room
+
+//group 
+/*
+    group {
+        id: Int,
+        name: String,
+        students: []
+        lecturer: String
+    }
+*/

@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+service MyService {
+  rpc GetStudentRequest(GetStudentRequest) returns (StudentResponse) {}
+}
+
+message StudentResponse {
+  string name = 1;
+  string surname = 2;
+}
+
+message GetStudentRequest {
+  int32 studentId = 1;
+}

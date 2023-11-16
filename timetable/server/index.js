@@ -6,6 +6,43 @@ import { expressMiddleware } from '@apollo/server/express4';
 import { startStandaloneServer } from '@apollo/server/standalone';
 import { gql } from 'apollo-server-express';
 import { faker } from '@faker-js/faker';
+import swaggerUi from'swagger-ui-express';
+import swaggerAutogen from 'swagger-autogen';
+
+const app = express();
+
+//swagger
+    const doc = {
+        info: {
+            version: '',            // by default: '1.0.0'
+            title: '',              // by default: 'REST API'
+            description: ''         // by default: ''
+        },
+        servers: [
+            {
+                url: 'http://localhost:4000',              // by default: 'http://localhost:3000'
+                description: ''       // by default: ''
+            },
+            // { ... }
+        ],
+        tags: [                   // by default: empty Array
+            {
+                name: '',             // Tag name
+                description: ''       // Tag description
+            },
+            // { ... }
+        ],
+        components: {}            // by default: empty object
+    };
+    
+
+    const routes = ['./index.js'];
+    const def = await swaggerAutogen({ openapi: '3.0.0' })('./swagger.json', routes, doc);
+
+    if(def){
+        app.use('/swagger', swaggerUi.serve, swaggerUi.setup(def.data));
+    }
+
 
 // Apollo Server
 const typeDefs = ` #graphql
@@ -37,7 +74,6 @@ const server = new ApolloServer({
     resolvers,
 });
 
-const app = express();
 await server.start()
 app.use('/graphql',cors(), express.json(), expressMiddleware(server));
 

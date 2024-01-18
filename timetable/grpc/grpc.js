@@ -3,9 +3,20 @@ import * as grpc from "@grpc/grpc-js";
 
 const packageDefinition = protoLoader.loadSync('./grpc.proto');
 
-const helloProto = grpc.loadPackageDefinition(packageDefinition);
+const scheduleProto = grpc.loadPackageDefinition(packageDefinition);
 
 const server = new grpc.Server();
+
+server.addService(scheduleProto.MyService.service, {
+  GetStudentRequest: (call, callback) => {
+    const studentId = call.request.studentId;
+    const response = {
+      name: "John",
+      surname: "Doe",
+    };
+    callback(null, response);
+  },
+});
 
 const bindAddress = '127.0.0.1:50052';
 
